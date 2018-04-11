@@ -103,8 +103,17 @@ impl<'a> MeshBuilder<'a> {
         }
     }
 
-    /// Add indices buffer to the `MeshBuilder`
+    /// Set indices buffer to the `MeshBuilder`
     pub fn with_indices<I>(mut self, indices: I) -> Self
+    where
+        I: Into<Indices<'a>>,
+    {
+        self.set_indices(indices);
+        self
+    }
+
+    /// Set indices buffer to the `MeshBuilder`
+    pub fn set_indices<I>(&mut self, indices: I) -> &mut Self
     where
         I: Into<Indices<'a>>,
     {
@@ -122,6 +131,16 @@ impl<'a> MeshBuilder<'a> {
         V: AsVertexFormat + 'a,
         D: Into<Cow<'a, [V]>>,
     {
+        self.add_vertices(vertices);
+        self
+    }
+
+    /// Add another vertices to the `MeshBuilder`
+    pub fn add_vertices<V, D>(&mut self, vertices: D) -> &mut Self
+    where
+        V: AsVertexFormat + 'a,
+        D: Into<Cow<'a, [V]>>,
+    {
         self.vertices
             .push((cast_cow(vertices.into()), V::VERTEX_FORMAT));
         self
@@ -131,6 +150,14 @@ impl<'a> MeshBuilder<'a> {
     ///
     /// By default, meshes are constructed as triangle lists.
     pub fn with_prim_type(mut self, prim: Primitive) -> Self {
+        self.prim = prim;
+        self
+    }
+
+    /// Sets the primitive type of the mesh.
+    ///
+    /// By default, meshes are constructed as triangle lists.
+    pub fn set_prim_type(&mut self, prim: Primitive) -> &mut Self {
         self.prim = prim;
         self
     }
