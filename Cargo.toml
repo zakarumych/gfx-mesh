@@ -11,7 +11,7 @@ documentation = "https://docs.rs/crate/gfx-mesh/0.1.0/gfx-mesh"
 
 [dependencies]
 gfx-hal = { version = "0.1", git = "https://github.com/gfx-rs/gfx", rev = "efa0822a" }
-gfx-render = { git = "https://github.com/gfx-rs/gfx-render", rev = "da28a48c" }
+gfx-render = { git = "https://github.com/gfx-rs/gfx-render", rev = "258b2050" }
 serde = { version = "1.0", optional = true }
 
 [target.'cfg(features = "serde")'.dependencies]
