@@ -5,6 +5,8 @@
 use std::borrow::Cow;
 use std::mem::size_of;
 
+use failure::Error;
+
 use hal::{Backend, IndexCount, IndexType, Primitive, VertexCount};
 use hal::buffer::{Access, IndexBufferView, Usage};
 use hal::command::RenderSubpassCommon;
@@ -13,7 +15,7 @@ use hal::pso::VertexBufferSet;
 
 use smallvec::SmallVec;
 
-use render::{Buffer, Error, Factory};
+use render::{Buffer, Factory};
 use utils::{cast_cow, is_slice_sorted, is_slice_sorted_by_key};
 use vertex::{AsVertexFormat, VertexFormat};
 

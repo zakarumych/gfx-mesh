@@ -9,6 +9,7 @@
 #![deny(dead_code)]
 #![deny(unused_must_use)]
 
+extern crate failure;
 extern crate gfx_hal as hal;
 extern crate gfx_render as render;
 
