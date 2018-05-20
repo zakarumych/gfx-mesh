@@ -333,7 +333,7 @@ where
 {
     /// Record drawing command for this biding.
     pub fn draw(self, vertex: VertexBufferSet<B>, encoder: &mut RenderSubpassCommon<B>) {
-        encoder.bind_vertex_buffers(vertex);
+        encoder.bind_vertex_buffers(0, vertex);
         match self {
             Bind::Indexed { index, count } => {
                 encoder.bind_index_buffer(index);
