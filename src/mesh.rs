@@ -169,6 +169,9 @@ impl<'a> MeshBuilder<'a> {
     where
         B: Backend,
     {
+        use hal::queue::{QueueFamily, QueueType};
+        let family = factory.families().iter().find(|qf| qf.queue_type() == QueueType::Graphics).or_else(|| factory.families().iter().find(|qf| qf.queue_type() == QueueType::General)).unwrap().id();
+
         Ok(Mesh {
             vbufs: self.vertices
                 .iter()
@@ -182,8 +185,9 @@ impl<'a> MeshBuilder<'a> {
                                 Usage::VERTEX | Usage::TRANSFER_DST,
                             )?;
                             factory.upload_buffer(
-                                Access::VERTEX_BUFFER_READ,
                                 &mut buffer,
+                                family,
+                                Access::VERTEX_BUFFER_READ,
                                 0,
                                 &vertices,
                             )?;
@@ -210,8 +214,9 @@ impl<'a> MeshBuilder<'a> {
                                 Usage::INDEX | Usage::TRANSFER_DST,
                             )?;
                             factory.upload_buffer(
-                                Access::INDEX_BUFFER_READ,
                                 &mut buffer,
+                                family,
+                                Access::INDEX_BUFFER_READ,
                                 0,
                                 &indices,
                             )?;
