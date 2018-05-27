@@ -12,6 +12,7 @@ use hal::buffer::{Access, IndexBufferView, Usage};
 use hal::command::RenderSubpassCommon;
 use hal::memory::Properties;
 use hal::pso::VertexBufferSet;
+use hal::queue::QueueFamilyId;
 
 use smallvec::SmallVec;
 
@@ -165,13 +166,10 @@ impl<'a> MeshBuilder<'a> {
     }
 
     /// Builds and returns the new mesh.
-    pub fn build<B>(&self, factory: &mut Factory<B>) -> Result<Mesh<B>, Error>
+    pub fn build<B>(&self, family: QueueFamilyId, factory: &mut Factory<B>) -> Result<Mesh<B>, Error>
     where
         B: Backend,
     {
-        use hal::queue::{QueueFamily, QueueType};
-        let family = factory.families().iter().find(|qf| qf.queue_type() == QueueType::Graphics).or_else(|| factory.families().iter().find(|qf| qf.queue_type() == QueueType::General)).unwrap().id();
-
         Ok(Mesh {
             vbufs: self.vertices
                 .iter()
@@ -258,7 +256,7 @@ where
     /// Bind buffers to specified attribute locations.
     pub fn bind<'a>(
         &'a self,
-        formats: &'a [VertexFormat<'a>],
+        formats: &[VertexFormat],
         vertex: &mut VertexBufferSet<'a, B>,
     ) -> Result<Bind<'a, B>, Incompatible> {
         debug_assert!(is_slice_sorted(formats));
