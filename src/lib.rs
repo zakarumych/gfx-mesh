@@ -22,6 +22,6 @@ mod mesh;
 mod utils;
 mod vertex;
 
-pub use vertex::{AsVertexFormat, Attribute, Color, Normal, PosColor, PosNormTangTex, PosNormTex,
+pub use vertex::{AsVertexFormat, Attribute, Color, Normal, PosColor, PosNorm, PosNormTangTex, PosNormTex,
                  PosTex, Position, Query, Tangent, TexCoord, VertexFormat, WithAttribute};
 pub use mesh::{Bind, Incompatible, IndexBuffer, Indices, Mesh, MeshBuilder, VertexBuffer};

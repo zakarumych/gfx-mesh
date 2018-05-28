@@ -226,6 +226,43 @@ impl WithAttribute<Color> for PosColor {
     };
 }
 
+/// Vertex format with position, normal, and UV texture coordinate attributes.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct PosNorm {
+    /// Position of the vertex in 3D space.
+    pub position: Position,
+    /// Normal vector of the vertex.
+    pub normal: Normal,
+}
+
+unsafe impl Pod for PosNorm {}
+
+impl AsVertexFormat for PosNorm {
+    const VERTEX_FORMAT: VertexFormat<'static> = VertexFormat {
+        attributes: Cow::Borrowed(&[
+            <Self as WithAttribute<Position>>::ELEMENT,
+            <Self as WithAttribute<Normal>>::ELEMENT,
+        ]),
+        stride: Position::SIZE + Normal::SIZE + TexCoord::SIZE,
+    };
+}
+
+impl WithAttribute<Position> for PosNorm {
+    const ELEMENT: Element<Format> = Element {
+        offset: 0,
+        format: Position::SELF,
+    };
+}
+
+impl WithAttribute<Normal> for PosNorm {
+    const ELEMENT: Element<Format> = Element {
+        offset: Position::SIZE,
+        format: Normal::SELF,
+    };
+}
+
 /// Vertex format with position and UV texture coordinate attributes.
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
