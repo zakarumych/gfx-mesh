@@ -282,11 +282,9 @@ where
         Ok(self.ibuf
             .as_ref()
             .map(|ibuf| Bind::Indexed {
-                index: IndexBufferView {
-                    buffer: ibuf.buffer.raw(),
-                    offset: 0,
-                    index_type: ibuf.index_type,
-                },
+                buffer: ibuf.buffer.raw(),
+                offset: 0,
+                index_type: ibuf.index_type,
                 count: ibuf.len,
             })
             .unwrap_or(Bind::Unindexed {
@@ -314,12 +312,16 @@ pub struct Incompatible;
 /// It only contains `IndexBufferView` (if index buffers exists)
 /// and vertex count.
 /// Vertex buffers are in separate `VertexBufferSet`
-// #[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Bind<'a, B: Backend> {
     /// Indexed binding.
     Indexed {
-        /// Index view to bind with `bind_index_buffer` method.
-        index: IndexBufferView<'a, B>,
+        /// The buffer to bind.
+        buffer: &'a B::Buffer,
+        /// The offset into the buffer to start at.
+        offset: u64,
+        /// The type of the table elements (`u16` or `u32`).
+        index_type: IndexType,
         /// Indices count to use in `draw_indexed` method.
         count: IndexCount,
     },
@@ -335,11 +337,15 @@ where
     B: Backend,
 {
     /// Record drawing command for this biding.
-    pub fn draw(self, vertex: VertexBufferSet<B>, encoder: &mut RenderSubpassCommon<B>) {
+    pub fn draw(&self, vertex: VertexBufferSet<B>, encoder: &mut RenderSubpassCommon<B>) {
         encoder.bind_vertex_buffers(0, vertex);
-        match self {
-            Bind::Indexed { index, count } => {
-                encoder.bind_index_buffer(index);
+        match *self {
+            Bind::Indexed { buffer, offset, index_type, count } => {
+                encoder.bind_index_buffer(IndexBufferView {
+                    buffer,
+                    offset,
+                    index_type,
+                });
                 encoder.draw_indexed(0..count, 0, 0..1);
             }
             Bind::Unindexed { count } => {
