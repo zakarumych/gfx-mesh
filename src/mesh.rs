@@ -7,12 +7,12 @@ use std::mem::size_of;
 
 use failure::Error;
 
-use hal::{Backend, IndexCount, IndexType, Primitive, VertexCount};
 use hal::buffer::{Access, IndexBufferView, Usage};
 use hal::command::RenderSubpassCommon;
 use hal::memory::Properties;
 use hal::pso::VertexBufferSet;
 use hal::queue::QueueFamilyId;
+use hal::{Backend, IndexCount, IndexType, Primitive, VertexCount};
 
 use smallvec::SmallVec;
 
@@ -166,12 +166,17 @@ impl<'a> MeshBuilder<'a> {
     }
 
     /// Builds and returns the new mesh.
-    pub fn build<B>(&self, family: QueueFamilyId, factory: &mut Factory<B>) -> Result<Mesh<B>, Error>
+    pub fn build<B>(
+        &self,
+        family: QueueFamilyId,
+        factory: &mut Factory<B>,
+    ) -> Result<Mesh<B>, Error>
     where
         B: Backend,
     {
         Ok(Mesh {
-            vbufs: self.vertices
+            vbufs: self
+                .vertices
                 .iter()
                 .map(|&(ref vertices, ref format)| {
                     let len = vertices.len() as VertexCount / format.stride;
@@ -179,8 +184,8 @@ impl<'a> MeshBuilder<'a> {
                         buffer: {
                             let mut buffer = factory.create_buffer(
                                 vertices.len() as _,
-                                Properties::DEVICE_LOCAL,
                                 Usage::VERTEX | Usage::TRANSFER_DST,
+                                Properties::DEVICE_LOCAL,
                             )?;
                             factory.upload_buffer(
                                 &mut buffer,
@@ -208,8 +213,8 @@ impl<'a> MeshBuilder<'a> {
                         buffer: {
                             let mut buffer = factory.create_buffer(
                                 indices.len() as _,
-                                Properties::DEVICE_LOCAL,
                                 Usage::INDEX | Usage::TRANSFER_DST,
+                                Properties::DEVICE_LOCAL,
                             )?;
                             factory.upload_buffer(
                                 &mut buffer,
@@ -260,9 +265,7 @@ where
         vertex: &mut VertexBufferSet<'a, B>,
     ) -> Result<Bind<'a, B>, Incompatible> {
         debug_assert!(is_slice_sorted(formats));
-        debug_assert!(is_slice_sorted_by_key(&self.vbufs, |vbuf| {
-            &vbuf.format
-        }));
+        debug_assert!(is_slice_sorted_by_key(&self.vbufs, |vbuf| &vbuf.format));
         debug_assert!(vertex.0.is_empty());
 
         let mut next = 0;
@@ -279,7 +282,8 @@ where
                 return Err(Incompatible);
             }
         }
-        Ok(self.ibuf
+        Ok(self
+            .ibuf
             .as_ref()
             .map(|ibuf| Bind::Indexed {
                 buffer: ibuf.buffer.raw(),
@@ -340,7 +344,12 @@ where
     pub fn draw(&self, vertex: VertexBufferSet<B>, encoder: &mut RenderSubpassCommon<B>) {
         encoder.bind_vertex_buffers(0, vertex);
         match *self {
-            Bind::Indexed { buffer, offset, index_type, count } => {
+            Bind::Indexed {
+                buffer,
+                offset,
+                index_type,
+                count,
+            } => {
                 encoder.bind_index_buffer(IndexBufferView {
                     buffer,
                     offset,
@@ -360,13 +369,9 @@ fn find_compatible_buffer<B>(vbufs: &[VertexBuffer<B>], format: &VertexFormat) -
 where
     B: Backend,
 {
-    debug_assert!(is_slice_sorted_by_key(&*format.attributes, |a| {
-        a.offset
-    }));
+    debug_assert!(is_slice_sorted_by_key(&*format.attributes, |a| a.offset));
     for (i, vbuf) in vbufs.iter().enumerate() {
-        debug_assert!(is_slice_sorted_by_key(&*vbuf.format.attributes, |a| {
-            a.offset
-        }));
+        debug_assert!(is_slice_sorted_by_key(&*vbuf.format.attributes, |a| a.offset));
         if is_compatible(&vbuf.format, format) {
             return Some(i);
         }

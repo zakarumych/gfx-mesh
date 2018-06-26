@@ -163,12 +163,10 @@ where
     T: Attribute,
 {
     const VERTEX_FORMAT: VertexFormat<'static> = VertexFormat {
-        attributes: Cow::Borrowed(&[
-            Element {
-                format: T::SELF,
-                offset: 0,
-            },
-        ]),
+        attributes: Cow::Borrowed(&[Element {
+            format: T::SELF,
+            offset: 0,
+        }]),
         stride: T::SIZE,
     };
 }
@@ -434,31 +432,4 @@ macro_rules! impl_query {
     };
 }
 
-impl_query!(
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-    I,
-    J,
-    K,
-    L,
-    M,
-    N,
-    O,
-    P,
-    Q,
-    R,
-    S,
-    T,
-    U,
-    V,
-    W,
-    X,
-    Y,
-    Z
-);
+impl_query!(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z);
