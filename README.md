@@ -1,3 +1,6 @@
+# Attention
+
+This project is discontinued in favor of [rendy](https://github.com/omni-viral/rendy).
 
 # `gfx-mesh`
 
